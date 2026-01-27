@@ -22,6 +22,13 @@ app.use(cookieParser());
 app.use('/api/auth', authRoutes);
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/customers', require('./routes/customerRoutes'));
+app.use('/api/products', require('./routes/productRoutes'));
+
+app.use('/api/voc', require('./routes/vocRoutes'));
+app.use('/api/feedback', require('./routes/feedbackRoutes'));
+app.use('/api/customer-requests', require('./routes/customerRequestRoutes'));
+app.use('/api/features', require('./routes/featureRoutes'));
+app.use('/api/search', require('./routes/searchRoutes'));
 
 app.get('/', (req, res) => {
     res.send('API is running...');
