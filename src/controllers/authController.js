@@ -7,7 +7,7 @@ const { sendResetEmail } = require('../../config/email');
 // @access  Public
 const signup = async (req, res) => {
     try {
-        const { username, email, password } = req.body;
+        const { userName, email, password } = req.body;
 
         // Check if user exists
         const userExists = await User.findOne({ email });
@@ -17,7 +17,7 @@ const signup = async (req, res) => {
 
         // Create user
         const user = await User.create({
-            username,
+            userName,
             email,
             password,
         });
@@ -25,7 +25,7 @@ const signup = async (req, res) => {
         if (user) {
             res.status(201).json({
                 _id: user._id,
-                username: user.username,
+                userName: user.userName,
                 email: user.email,
                 token: generateToken({ id: user._id }),
             });
@@ -50,7 +50,7 @@ const login = async (req, res) => {
         if (user && (await user.matchPassword(password))) {
             res.json({
                 _id: user._id,
-                username: user.username,
+                userName: user.userName,
                 email: user.email,
                 token: generateToken({ id: user._id }),
             });

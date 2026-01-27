@@ -13,7 +13,7 @@ const addCustomer = async (req, res) => {
             companyDataURL,
             location,
             email,
-            currentProduct,
+            currentProductID,
             featureList,
         } = req.body;
 
@@ -25,7 +25,7 @@ const addCustomer = async (req, res) => {
             companyDataURL,
             location,
             email,
-            currentProduct,
+            currentProductID,
             featureList,
             user: req.user._id,
         });
