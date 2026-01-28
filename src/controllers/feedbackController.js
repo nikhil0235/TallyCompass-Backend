@@ -1,4 +1,4 @@
-const Feedback = require('../modules/Feedback');
+const Feedback = require('../models/Feedback');
 
 // @desc    Add a new feedback
 // @route   POST /api/feedback

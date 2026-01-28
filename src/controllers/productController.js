@@ -1,4 +1,4 @@
-const Product = require('../modules/Product');
+const Product = require('../models/Product');
 
 // @desc    Add a new product
 // @route   POST /api/products
