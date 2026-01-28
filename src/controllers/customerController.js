@@ -1,4 +1,4 @@
-const Customer = require('../modules/Customer');
+const Customer = require('../models/Customer');
 
 // @desc    Add a new customer
 // @route   POST /api/customers

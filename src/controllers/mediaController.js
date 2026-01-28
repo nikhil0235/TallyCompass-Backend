@@ -1,5 +1,5 @@
 // Controller for image/media upload, retrieval, and deletion
-const { Media, cloudinary } = require('../modules/Media');
+const { Media, cloudinary } = require('../models/Media');
 
 const uploadImage = async (req, res) => {
     try {
