@@ -1,4 +1,4 @@
-const UnifiedEmbedding = require('../models/UnifiedEmbedding');
+const UnifiedEmbedding = require('../modules/UnifiedEmbedding');
 const { generateEmbedding, generateCompletion } = require('../utils/openai');
 
 /**
