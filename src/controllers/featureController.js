@@ -1,4 +1,4 @@
-const Feature = require('../models/Feature');
+const Feature = require('../modules/Feature');
 
 // @desc    Add a new feature
 // @route   POST /api/feature

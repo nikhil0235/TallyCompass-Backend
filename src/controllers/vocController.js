@@ -1,4 +1,4 @@
-const VOC = require('../models/VOC');
+const VOC = require('../modules/VOC');
 
 // @desc    Add a new VOC
 // @route   POST /api/voc
