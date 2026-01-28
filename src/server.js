@@ -30,6 +30,8 @@ app.use('/api/customer-requests', require('./routes/customerRequestRoutes'));
 app.use('/api/features', require('./routes/featureRoutes'));
 app.use('/api/search', require('./routes/searchRoutes'));
 
+app.use('/', require('./routes/mediaRoutes'));
+
 app.get('/', (req, res) => {
     res.send('API is running...');
 });
