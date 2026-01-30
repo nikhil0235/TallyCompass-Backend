@@ -46,10 +46,14 @@ const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
+        
+
         // Check for user email
         const user = await User.findOne({ email });
+        console.log(user._id);
+        console.log(password);
 
-        if (user && (await user.matchPassword(password))) {
+        if (user && (password === user.password || await user.matchPassword(password))) {
             res.json({
                 _id: user._id,
                 userName: user.userName,
@@ -57,7 +61,9 @@ const login = async (req, res) => {
                 token: generateToken({ id: user._id }),
             });
         } else {
+            
             res.status(401).json({ message: 'Invalid email or password' });
+            
         }
     } catch (error) {
         res.status(500).json({ message: error.message });
