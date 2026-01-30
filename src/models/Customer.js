@@ -60,8 +60,7 @@ const customerSchema = new mongoose.Schema({
     },
     currentProductID: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product',
-        required: true
+        ref: 'Product'
     },
     featureList: [{
         type: mongoose.Schema.Types.ObjectId,
