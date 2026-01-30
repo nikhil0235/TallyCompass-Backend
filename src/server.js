@@ -40,8 +40,15 @@ app.get('/', (req, res) => {
     res.send('API is running...');
 });
 
+
+const http = require('http');
+const { setSocketIO } = require('./socket');
+
+const server = http.createServer(app);
+setSocketIO(server);
+
 connectDB().then(() => {
-    app.listen(config.PORT, () => {
-        console.log(`Server running on port ${config.PORT}`);
+    server.listen(config.PORT, () => {
+        console.log(`Server running with Socket.IO on port ${config.PORT}`);
     });
 });
