@@ -1,9 +1,12 @@
 const mongoose = require('mongoose');
 
 const customerRequestSchema = new mongoose.Schema({
-    customerId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Customer',
+
+    customterList : {
+        type: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Customer'
+        }],
         required: true
     },
     productId: {
@@ -21,6 +24,11 @@ const customerRequestSchema = new mongoose.Schema({
     },
     description: {
         type: String,
+    },
+    priority : {
+        type: String,
+        enum: ['low', 'medium', 'high'],
+        required: true
     },
     action: {
         status: {
