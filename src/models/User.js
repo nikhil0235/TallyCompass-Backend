@@ -19,9 +19,12 @@ const userSchema = new mongoose.Schema({
   profilePicture: {
     type: String,
   },
+  yearOfJoining: {
+    type: Number
+  },
   function: {
     type: String,
-    enum: ['PM', 'Developer', 'QA', 'Designer'],
+    enum: ['PM', 'Developer', 'QA', 'Designer', 'Sales Manager', 'Branch Manager', 'Partner'],
     default: 'PM'
   },
   designation: {
@@ -31,9 +34,20 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['active', 'inactive'],
     default: 'active'
+  },
+  location: {
+    city: {
+      type: String,
+    },
+    state: {
+      type: String,
+    },
+    Country: {
+      type: String,
+    }
   }
 }, {
-  timestamps: true,
+  timestamps: true
 });
 
 // Hash password before saving

@@ -62,7 +62,7 @@ const getAllVOCs = async (req, res) => {
         // Basic filtering logic can be added here if needed, e.g., ?Status=Open
         // req.query automatically handles simple key-value pairs which match Mongoose structure.
 
-        const vocs = await VOC.find(queryObj).populate('UserID').populate('ProductID');
+        const vocs = await VOC.find(queryObj);
         res.json(vocs);
     } catch (error) {
         res.status(500).json({ message: error.message });

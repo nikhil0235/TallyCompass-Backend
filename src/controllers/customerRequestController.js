@@ -57,9 +57,7 @@ const getCustomerRequest = async (req, res) => {
 // @access  Private
 const getAllCustomerRequests = async (req, res) => {
     try {
-        const customerRequests = await CustomerRequest.find(req.query)
-            .populate('CustomerId')
-            .populate('ProductID');
+        const customerRequests = await CustomerRequest.find();
         res.json(customerRequests);
     } catch (error) {
         res.status(500).json({ message: error.message });
