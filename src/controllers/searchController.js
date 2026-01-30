@@ -16,6 +16,7 @@ const search = async (req, res) => {
 
         // 1. Generate embedding for the query
         const queryEmbedding = await generateEmbedding(query);
+        console.log(queryEmbedding);
 
         // 2. Perform vector search
         // Note: 'vectorSearch' requires an Atlas Vector Search Index named 'vector_index' (default) or specified.

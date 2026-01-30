@@ -33,6 +33,8 @@ app.use('/', require('./routes/mediaRoutes'));
 app.use('/api/dashboard', require('./routes/dashboardRoutes'));
 app.use('/api/forms', require('./routes/formRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
+app.use('/api/meetings', require('./routes/meetingRoutes'));
+
 
 app.get('/', (req, res) => {
     res.send('API is running...');
