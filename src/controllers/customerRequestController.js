@@ -1,4 +1,5 @@
 const CustomerRequest = require('../models/CustomerRequest');
+const { checkAndSendMentions } = require('../utils/notification');
 
 // @desc    Add a new customer request
 // @route   POST /api/customer-requests
@@ -6,6 +7,9 @@ const CustomerRequest = require('../models/CustomerRequest');
 const addCustomerRequest = async (req, res) => {
     try {
         const customerRequest = await CustomerRequest.create(req.body);
+        if (req.body.description) {
+            await checkAndSendMentions(req.body.description, 'CustomerRequest', customerRequest._id, req.user._id);
+        }
         res.status(201).json(customerRequest);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -22,6 +26,9 @@ const updateCustomerRequest = async (req, res) => {
             return res.status(404).json({ message: 'Customer Request not found' });
         }
         const updatedCustomerRequest = await CustomerRequest.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (req.body.description) {
+            await checkAndSendMentions(req.body.description, 'CustomerRequest', updatedCustomerRequest._id, req.user._id);
+        }
         res.json(updatedCustomerRequest);
     } catch (error) {
         res.status(500).json({ message: error.message });

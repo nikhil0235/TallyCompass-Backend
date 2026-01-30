@@ -1,4 +1,5 @@
 const Feedback = require('../models/Feedback');
+const { checkAndSendMentions } = require('../utils/notification');
 
 // @desc    Add a new feedback
 // @route   POST /api/feedback
@@ -6,6 +7,9 @@ const Feedback = require('../models/Feedback');
 const addFeedback = async (req, res) => {
     try {
         const feedback = await Feedback.create(req.body);
+        if (req.body.description) {
+            await checkAndSendMentions(req.body.description, 'Feedback', feedback._id, req.user._id);
+        }
         res.status(201).json(feedback);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -22,6 +26,9 @@ const updateFeedback = async (req, res) => {
             return res.status(404).json({ message: 'Feedback not found' });
         }
         const updatedFeedback = await Feedback.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (req.body.description) {
+            await checkAndSendMentions(req.body.description, 'Feedback', updatedFeedback._id, req.user._id);
+        }
         res.json(updatedFeedback);
     } catch (error) {
         res.status(500).json({ message: error.message });
