@@ -8,6 +8,7 @@ const { sendResetEmail } = require('../../config/email');
 const signup = async (req, res) => {
     try {
         const { userName, email, password } = req.body;
+        console.log(req.body);
 
         // Check if user exists
         const userExists = await User.findOne({ email });
@@ -34,6 +35,7 @@ const signup = async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({ message: error.message });
+        console.log(error);
     }
 };
 
@@ -113,7 +115,7 @@ const resetPassword = async (req, res) => {
         // Verify reset token
         const jwt = require('jsonwebtoken');
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
+
         if (decoded.type !== 'reset') {
             return res.status(400).json({ message: 'Invalid reset token' });
         }

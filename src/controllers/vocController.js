@@ -1,4 +1,5 @@
 const VOC = require('../models/VOC');
+const { checkAndSendMentions } = require('../utils/notification');
 
 // @desc    Add a new VOC
 // @route   POST /api/voc
@@ -6,6 +7,9 @@ const VOC = require('../models/VOC');
 const addVOC = async (req, res) => {
     try {
         const voc = await VOC.create({ ...req.body, UserID: req.user._id }); // Assign current user
+        if (req.body.description) {
+            await checkAndSendMentions(req.body.description, 'VOC', voc._id, req.user._id);
+        }
         res.status(201).json(voc);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -25,6 +29,9 @@ const updateVOC = async (req, res) => {
             return res.status(404).json({ message: 'VOC not found' });
         }
         const updatedVOC = await VOC.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (req.body.description) {
+            await checkAndSendMentions(req.body.description, 'VOC', updatedVOC._id, req.user._id);
+        }
         res.json(updatedVOC);
     } catch (error) {
         res.status(500).json({ message: error.message });
