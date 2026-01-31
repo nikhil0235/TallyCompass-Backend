@@ -16,7 +16,7 @@ const meetingSchema = new mongoose.Schema({
         enum: ['scheduled', 'active', 'completed'],
         default: 'scheduled'
     },
-    dropboxFileId: {
+    /*dropboxFileId: {
         type: String, // ID from Dropbox API
     },
     dropboxPath: {
@@ -30,7 +30,7 @@ const meetingSchema = new mongoose.Schema({
     },
     summary: {
         type: String // AI Summary
-    }
+    }*/
 }, {
     timestamps: true
 });
