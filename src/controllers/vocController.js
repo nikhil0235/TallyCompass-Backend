@@ -1,14 +1,15 @@
 const VOC = require('../models/VOC');
-const { checkAndSendMentions } = require('../utils/notification');
+
 
 // @desc    Add a new VOC
 // @route   POST /api/voc
 // @access  Private
 const addVOC = async (req, res) => {
     try {
-        const voc = await VOC.create({ ...req.body, userID: req.user._id });
-        if (req.body.description) {
-            await checkAndSendMentions(req.body.description, 'VOC', voc._id, req.user._id);
+        const voc = await VOC.create({ ...req.body, UserID: req.user._id }); // Assign current user
+        if (req.body.description || (req.body.stakeHolders && req.body.stakeHolders.length > 0)) {
+            const { sendNotifications } = require('../utils/notification');
+            await sendNotifications(req.body.description, 'VOC', voc._id, req.user._id, req.body.stakeHolders);
         }
         res.status(201).json(voc);
     } catch (error) {
@@ -29,8 +30,10 @@ const updateVOC = async (req, res) => {
             return res.status(404).json({ message: 'VOC not found' });
         }
         const updatedVOC = await VOC.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        if (req.body.description) {
-            await checkAndSendMentions(req.body.description, 'VOC', updatedVOC._id, req.user._id);
+        const stakeholders = req.body.stakeHolders || updatedVOC.stakeHolders;
+        if (req.body.description || (stakeholders && stakeholders.length > 0)) {
+            const { sendNotifications } = require('../utils/notification');
+            await sendNotifications(req.body.description, 'VOC', updatedVOC._id, req.user._id, stakeholders);
         }
         res.json(updatedVOC);
     } catch (error) {

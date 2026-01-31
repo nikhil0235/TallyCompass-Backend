@@ -6,6 +6,21 @@ const vocSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
+    connectType: {
+        type: String,
+        enum: ['VOC', 'Management', 'Event', 'Other'],
+        default: 'VOC'
+    },
+    connectName: {
+        type: String,
+        // For events, this can be Founder's Day etc. 
+        // For VOCs, this can be JSON VOC etc.
+        // For ManagementMeet, this can be CIS Meet
+    },
+    stakeHolders: [{ // all the required stakeholders for that VOC.
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
     vocStartDate: {
         type: Date,
     },
