@@ -11,6 +11,12 @@ exports.submitResponse = async (req, res) => {
 
         // Basic validation
         if (!answers || !Array.isArray(answers)) {
+            console.log("Error while submitting form");
+            const newResponse = new FormResponse({
+                rawResponse: req.body
+            });
+            await newResponse.save();
+
             return res.status(400).json({ success: false, message: 'Answers array is required' });
         }
 
@@ -31,6 +37,13 @@ exports.submitResponse = async (req, res) => {
         });
     } catch (error) {
         console.error('Error saving form response:', error);
+
+        const newResponse = new FormResponse({
+            rawResponse: req.body,
+            title: "Error Form"
+        });
+        await newResponse.save();
+
         res.status(500).json({
             success: false,
             message: 'Server Error',
