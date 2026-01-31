@@ -1,21 +1,21 @@
 const Meeting = require('../models/Meeting');
 const { v4: uuidv4 } = require('uuid');
-const { Dropbox } = require('dropbox');
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
-const axios = require('axios');
-const { transcribeAudio, generateSummary } = require('../utils/openai');
+//const { Dropbox } = require('dropbox');
+//const fs = require('fs');
+//const path = require('path');
+//const os = require('os');
+//const axios = require('axios');
+//const { transcribeAudio, generateSummary } = require('../utils/openai');
 
 // Initialize Dropbox client
 // Note: Requires process.env.DROPBOX_ACCESS_TOKEN or refresh token flow
-const getDropboxClient = () => {
+/*const getDropboxClient = () => {
     return new Dropbox({
         clientId: process.env.DROPBOX_APP_KEY,
         clientSecret: process.env.DROPBOX_APP_SECRET,
         accessToken: process.env.DROPBOX_ACCESS_TOKEN
     });
-};
+};*/
 
 /**
  * Create a new Jitsi meeting room
@@ -24,7 +24,7 @@ const getDropboxClient = () => {
  */
 exports.createMeeting = async (req, res) => {
     try {
-        const roomName = `Jitsi-${uuidv4()}`; // Generate unique room name
+        const roomName = `tally-${uuidv4()}`; // Generate unique room name
 
         const meeting = await Meeting.create({
             roomName,
@@ -49,6 +49,7 @@ exports.createMeeting = async (req, res) => {
  * @route POST /api/meetings/recording
  * @access Private
  */
+/*
 exports.saveMeetingRecording = async (req, res) => {
     try {
         const { roomName, dropboxPath } = req.body;
@@ -93,12 +94,13 @@ exports.saveMeetingRecording = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
-
+*/
 /**
  * Get recording stream/link
  * @route GET /api/meetings/:id/recording
  * @access Private
  */
+/*
 exports.getRecording = async (req, res) => {
     try {
         const meeting = await Meeting.findById(req.params.id);
@@ -121,7 +123,7 @@ exports.getRecording = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
-
+*/
 /**
  * Get meeting details
  * @route GET /api/meetings/:id
@@ -147,7 +149,7 @@ exports.getMeeting = async (req, res) => {
  * @route POST /api/meetings/:id/summary
  * @access Private
  */
-exports.generateMeetingSummary = async (req, res) => {
+/*exports.generateMeetingSummary = async (req, res) => {
     let tempFilePath = null;
     try {
         const meeting = await Meeting.findById(req.params.id);
@@ -213,4 +215,4 @@ exports.generateMeetingSummary = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
-
+*/
