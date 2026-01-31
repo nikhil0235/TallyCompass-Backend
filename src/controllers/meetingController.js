@@ -1,5 +1,7 @@
 const Meeting = require('../models/Meeting');
-const { v4: uuidv4 } = require('uuid');
+//import { Meeting } from "../models/Meeting.js";
+const { v4 } = require('uuid');
+//import { v4 as uuidv4 } from "uuid";
 //const { Dropbox } = require('dropbox');
 //const fs = require('fs');
 //const path = require('path');
@@ -24,7 +26,7 @@ const { v4: uuidv4 } = require('uuid');
  */
 exports.createMeeting = async (req, res) => {
     try {
-        const roomName = `tally-${uuidv4()}`; // Generate unique room name
+        const roomName = `tally-${v4()}`; // Generate unique room name
 
         const meeting = await Meeting.create({
             roomName,
