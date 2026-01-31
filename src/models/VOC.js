@@ -47,10 +47,10 @@ const vocSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'CustomerRequest'
         }],
-        customerID: {
+        customerID: [{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Customer'
-        },
+        }],
         status: {
             type: String,
             enum: ['Pending', 'Completed', 'Cancelled'],
