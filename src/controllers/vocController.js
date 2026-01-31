@@ -6,7 +6,7 @@ const VOC = require('../models/VOC');
 // @access  Private
 const addVOC = async (req, res) => {
     try {
-        const voc = await VOC.create({ ...req.body, UserID: req.user._id }); // Assign current user
+        const voc = await VOC.create({ ...req.body, userID: req.user._id }); // Assign current user
         if (req.body.description || (req.body.stakeHolders && req.body.stakeHolders.length > 0)) {
             const { sendNotifications } = require('../utils/notification');
             await sendNotifications(req.body.description, 'VOC', voc._id, req.user._id, req.body.stakeHolders);
