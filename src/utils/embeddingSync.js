@@ -34,10 +34,6 @@ const formatDocument = async (doc, modelName) => {
                 break;
 
             case 'VOC':
-                // VOCs have references that might need population if not already present
-                // However, hooks often receive the document essentially as is. 
-                // We might need to fetch related data if it's not populated.
-                // For simplicity in hooks, we'll try to populate if possible or fetch fresh.
                 await doc.populate(['customerDetailsObj.customerID', 'ProductID', 'customerDetailsObj.feedbackID', 'customerDetailsObj.customerRequestID']);
 
                 const vocCustomerName = doc.customerDetailsObj?.customerID?.companyName || 'Unknown Customer';
@@ -53,14 +49,14 @@ const formatDocument = async (doc, modelName) => {
                 break;
 
             case 'CustomerRequest':
-                await doc.populate(['customerId', 'productId']);
-                const reqCustomerName = doc.customerId?.companyName || 'Unknown Customer';
+                await doc.populate(['customterList', 'productId']);
+                const reqCustomerNames = doc.customterList?.map(c => c.companyName).join(', ') || 'Unknown Customer';
                 const reqProductName = doc.productId?.productName || 'Unknown Product';
 
-                text = `Request: ${doc.requestTitle}. Type: ${doc.requestType}. Description: ${doc.description}. Status: ${doc.action?.status}. Customer: ${reqCustomerName}. Product: ${reqProductName}.`;
+                text = `Request: ${doc.requestTitle}. Type: ${doc.requestType}. Description: ${doc.description}. Status: ${doc.action?.status}. Customers: ${reqCustomerNames}. Product: ${reqProductName}.`;
                 metadata = {
                     requestId: doc._id,
-                    customerId: doc.customerId?._id,
+                    customerIds: doc.customterList?.map(c => c._id) || [],
                     productId: doc.productId?._id,
                     type: doc.requestType,
                     status: doc.action?.status

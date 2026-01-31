@@ -6,7 +6,7 @@ const { checkAndSendMentions } = require('../utils/notification');
 // @access  Private
 const addVOC = async (req, res) => {
     try {
-        const voc = await VOC.create({ ...req.body, UserID: req.user._id }); // Assign current user
+        const voc = await VOC.create({ ...req.body, userID: req.user._id });
         if (req.body.description) {
             await checkAndSendMentions(req.body.description, 'VOC', voc._id, req.user._id);
         }
@@ -43,7 +43,7 @@ const updateVOC = async (req, res) => {
 // @access  Private
 const getVOC = async (req, res) => {
     try {
-        const voc = await VOC.findById(req.params.id).populate('UserID').populate('ProductID');
+        const voc = await VOC.findById(req.params.id).populate('userID').populate('ProductID');
         if (!voc) {
             return res.status(404).json({ message: 'VOC not found' });
         }
