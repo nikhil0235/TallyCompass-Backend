@@ -21,10 +21,13 @@ exports.createNotification = async (req, res) => {
         });
         await notification.save();
 
-        // Emit real-time event to the user
+        // Emit real-time event only to the specific user
         try {
             const io = getSocketIO();
-            io.emit('new-notification', notification); // You can target specific users if needed
+            if (toUser) {
+                io.to(toUser.toString()).emit('new-notification', notification);
+                console.log(`Emitted new-notification to user ${toUser}`);
+            }
         } catch (e) {
             console.error('Socket.IO emit error:', e);
         }

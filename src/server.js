@@ -48,7 +48,20 @@ const server = http.createServer(app);
 setSocketIO(server);
 
 connectDB().then(() => {
+    const { getSocketIO } = require('./socket');
     server.listen(config.PORT, () => {
         console.log(`Server running with Socket.IO on port ${config.PORT}`);
+    });
+
+    // Socket.IO user room join logic
+    const io = getSocketIO();
+    io.on('connection', (socket) => {
+        // Listen for join event from frontend
+        socket.on('join', (userId) => {
+            if (userId) {
+                socket.join(userId);
+                console.log(`User ${userId} joined their notification room.`);
+            }
+        });
     });
 });
