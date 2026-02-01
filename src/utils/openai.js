@@ -31,7 +31,23 @@ const generateEmbedding = async (text) => {
         // console.log(res.data.data[0].embedding);
         return res.data.data[0].embedding;
     } catch (error) {
-        console.error("Error fetching embeddings:", error.response?.data || error.message);
+        console.error("Error fetching embeddings from OpenRouter:", error.response?.data || error.message);
+
+        // Fallback to direct OpenAI call
+        if (process.env.OPENAI_API_KEY) {
+            console.log("Falling back to direct OpenAI API for embeddings...");
+            const directOpenAI = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+            try {
+                const response = await directOpenAI.embeddings.create({
+                    model: "text-embedding-3-large",
+                    input: text,
+                });
+                return response.data[0].embedding;
+            } catch (fallbackError) {
+                console.error("Fallback OpenAI Embedding failed:", fallbackError);
+            }
+        }
+
         return null;
     }
 };
@@ -65,7 +81,28 @@ const generateCompletion = async (systemPrompt, userQuery) => {
         );
         return response.data.choices[0].message.content;
     } catch (error) {
-        console.error("Error generating completion:", error.response?.data || error.message);
+        console.error("Error generating completion from OpenRouter:", error.response?.data || error.message);
+
+        // Fallback to direct OpenAI call
+        if (process.env.OPENAI_API_KEY) {
+            console.log("Falling back to direct OpenAI API for completion...");
+            const directOpenAI = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+            try {
+                const completion = await directOpenAI.chat.completions.create({
+                    model: "gpt-4o",
+                    messages: [
+                        { role: "system", content: systemPrompt },
+                        { role: "user", content: userQuery }
+                    ],
+                    max_tokens: 1000
+                });
+                return completion.choices[0].message.content;
+            } catch (fallbackError) {
+                console.error("Fallback OpenAI Completion failed:", fallbackError);
+                throw fallbackError;
+            }
+        }
+
         throw error;
     }
 };
