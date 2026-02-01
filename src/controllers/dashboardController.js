@@ -164,6 +164,8 @@ const dashboardController = {
           activeVOCProjects,
           averageCustomerRating,
           pendingRequests,
+          vocCompletionRate,
+          activeVOCCount,
         },
         customerAnalytics: {
           customerStatus,
