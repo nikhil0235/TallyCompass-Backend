@@ -26,7 +26,7 @@ app.use('/api/products', require('./routes/productRoutes'));
 
 app.use('/api/voc', require('./routes/vocRoutes'));
 app.use('/api/feedback', require('./routes/feedbackRoutes'));
-app.use('/api/customer-requests', require('./routes/customerRequestRoutes'));
+app.use('/api/customerrequest', require('./routes/customerRequestRoutes'));
 app.use('/api/features', require('./routes/featureRoutes'));
 app.use('/api/search', require('./routes/searchRoutes'));
 app.use('/api/media', require('./routes/mediaRoutes'));

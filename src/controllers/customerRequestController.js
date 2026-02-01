@@ -2,7 +2,7 @@ const CustomerRequest = require('../models/CustomerRequest');
 const { checkAndSendMentions } = require('../utils/notification');
 
 // @desc    Add a new customer request
-// @route   POST /api/customer-requests
+// @route   POST /api/
 // @access  Private
 const addCustomerRequest = async (req, res) => {
     try {
@@ -24,7 +24,7 @@ const addCustomerRequest = async (req, res) => {
 const updateCustomerRequest = async (req, res) => {
     try {
         const customerRequest = await CustomerRequest.findById(req.params.id);
-        console.log ('Updating customer request with data:', req.body);
+        console.log('Updating customer request with data:', req.body);
         if (!customerRequest) {
             return res.status(404).json({ message: 'Customer Request not found' });
         }
