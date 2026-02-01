@@ -14,14 +14,40 @@ const formatDocument = async (doc, modelName) => {
     try {
         switch (modelName) {
             case 'Customer':
-                text = `Customer: ${doc.companyName}. Contact: ${doc.contactPersonName}. Location: ${doc.location?.city}, ${doc.location?.state}, ${doc.location?.country}. Business: ${doc.businessType}. Plan: ${doc.planType}. Features: ${doc.featureList?.join(', ')}.`;
+                text = `Customer: ${doc.companyName}. Contact: ${doc.contactPersonName}. Email: ${doc.email}. Phone: ${doc.contactNo}. Proficiency: ${doc.customerProficiency}. Status: ${doc.accountStatus}. Location: ${doc.location?.city}, ${doc.location?.state}, ${doc.location?.country}. Business: ${doc.businessType}. Plan: ${doc.planType}. Features: ${doc.featureList?.join(', ')}.`;
                 metadata = {
                     customerId: doc._id,
                     city: doc.location?.city,
                     state: doc.location?.state,
                     country: doc.location?.country,
                     planType: doc.planType,
-                    businessType: doc.businessType
+                    businessType: doc.businessType,
+                    status: doc.accountStatus,
+                    proficiency: doc.customerProficiency
+                };
+                break;
+
+            case 'User':
+                text = `User: ${doc.fullName} (${doc.userName}). Role: ${doc.function}. Designation: ${doc.designation}. Email: ${doc.email}. Status: ${doc.status}. Location: ${doc.location?.city}, ${doc.location?.state}, ${doc.location?.Country}. Year of Joining: ${doc.yearOfJoining}.`;
+                metadata = {
+                    userId: doc._id,
+                    role: doc.function,
+                    email: doc.email,
+                    status: doc.status,
+                    city: doc.location?.city,
+                    state: doc.location?.state,
+                    country: doc.location?.Country
+                };
+                break;
+
+            case 'FormResponse':
+                const qaPairs = doc.answers?.map(a => `Q: ${a.question} A: ${Array.isArray(a.answer) ? a.answer.join(', ') : a.answer}`).join('. ');
+                text = `Form Response: ${doc.title}. Submitted by: ${doc.email}. Responses: ${qaPairs}`;
+                metadata = {
+                    formResponseId: doc._id,
+                    formId: doc.formId,
+                    email: doc.email,
+                    title: doc.title
                 };
                 break;
 
