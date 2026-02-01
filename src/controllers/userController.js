@@ -58,15 +58,16 @@ const updateUserProfile = async (req, res) => {
             // Define allowed fields to prevent pollution
             const allowedUpdates = [
                 'fullName',
-                'userName',
-                'email',
+                // 'userName', // username update disabled
+                // 'email',    // email update disabled
                 'password',
                 'profilePicture',
                 'yearOfJoining',
                 'function',
                 'designation',
                 'status',
-                'location'
+                'location',
+                'experience'
             ];
 
             // Iterate over keys in req.body and update if allowed
@@ -87,6 +88,7 @@ const updateUserProfile = async (req, res) => {
                 yearOfJoining: updatedUser.yearOfJoining,
                 function: updatedUser.function,
                 designation: updatedUser.designation,
+                experience: updatedUser.experience,
                 status: updatedUser.status,
                 location: updatedUser.location,
             });
