@@ -50,10 +50,10 @@ const search = async (req, res) => {
         const context = results.map(r => `[Source: ${r.sourceCollection} | ID: ${r.sourceId}] ${r.text}`).join('\n---\n');
 
         // 4. Generate Answer
-        const systemPrompt = `You are a helpful assistant for the 'Voice of Customer' platform.
+        const systemPrompt = `You are a helpful assistant for the 'Customer Feedbacks' platform.
         Use the following pieces of context to answer the user's question.
         Each piece of context starts with [Source: COLLECTION | ID: IDENTIFIER].
-        When answering, you can reference the source type and ID if relevant.
+        When answering, You Must mention the context at start [Source: COLLECTION | ID: IDENTIFIER].
         Context:
         ${context}
         `;
