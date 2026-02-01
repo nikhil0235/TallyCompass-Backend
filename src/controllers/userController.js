@@ -20,8 +20,13 @@ const getUserProfile = async (req, res) => {
         if (user) {
             res.json({
                 _id: user._id,
-                username: user.username,
+                username: user.userName,
                 email: user.email,
+                profilePicture: user.profilePicture,
+                function: user.function,
+                designation: user.designation,
+                experience: user.experience,
+                status: user.status
             });
         } else {
             res.status(404).json({ message: 'User not found' });
@@ -41,7 +46,8 @@ const getUserProfile = async (req, res) => {
 const updateUserProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
-
+        
+        console.log('Updating user:', req.body);
         if (user) {
             // Map 'username' from request to 'userName' in model if present
             if (req.body.username) {
@@ -75,7 +81,6 @@ const updateUserProfile = async (req, res) => {
             res.json({
                 _id: updatedUser._id,
                 username: updatedUser.userName, // returning as username for consistency with frontend expectations
-                userName: updatedUser.userName,
                 fullName: updatedUser.fullName,
                 email: updatedUser.email,
                 profilePicture: updatedUser.profilePicture,

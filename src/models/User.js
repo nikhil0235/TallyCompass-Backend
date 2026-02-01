@@ -36,6 +36,9 @@ const userSchema = new mongoose.Schema({
   designation: {
     type: String,
   },
+  experience: {
+    type: String,
+  },
   status: {
     type: String,
     enum: ['active', 'inactive'],

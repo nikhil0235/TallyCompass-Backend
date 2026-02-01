@@ -3,19 +3,46 @@ const { Media, cloudinary } = require('../models/Media');
 
 const uploadImage = async (req, res) => {
     try {
+        console.log('Upload request received');
+        console.log('req.file keys:', Object.keys(req.file || {}));
+        console.log('req.file:', req.file);
+        
         if (!req.file) {
-            return res.status(400).send('No file uploaded.');
+            return res.status(400).json({ error: 'No file uploaded.' });
         }
+        
+        // multer-storage-cloudinary provides URL in different properties
+        let fileUrl = req.file.secure_url || req.file.url || req.file.path;
+        
+        // If still no URL, construct it from Cloudinary
+        if (!fileUrl && req.file.public_id) {
+            fileUrl = cloudinary.url(req.file.public_id, {
+                secure: true,
+                resource_type: req.file.resource_type || 'auto'
+            });
+        }
+        
+        console.log('Final file URL:', fileUrl);
+        
+        if (!fileUrl || fileUrl.startsWith('blob:')) {
+            console.error('Invalid URL:', fileUrl);
+            return res.status(500).json({ error: 'Failed to get valid file URL from Cloudinary' });
+        }
+        
         const media = new Media({
-            title: req.body.title,
-            imageUrl: req.file.path,
-            publicId: req.file.filename || req.file.public_id,
-            resourceType: req.file.mimetype && req.file.mimetype.startsWith('video') ? 'video' : 'image',
+            title: req.body.title || req.file.originalname,
+            imageUrl: fileUrl,
+            publicId: req.file.public_id,
+            resourceType: req.file.resource_type || 'image',
         });
+        
         await media.save();
+        console.log('Media saved to DB:', media);
+        
         res.json({ message: 'Uploaded!', data: media });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error('Upload error:', err);
+        res.status(500).json({ error: err.message || 'Upload failed' });
     }
 };
 

@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
 
 const customerSchema = new mongoose.Schema({
+
     contactPersonName: {
+        type: String
+    },
+    customerPrfilePictureURL : {
         type: String
     },
     companyName: {
@@ -51,8 +55,8 @@ const customerSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        required: true,
         unique: true,
+        sparse: true,
         match: [
             /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
             'Please add a valid email',

@@ -58,12 +58,18 @@ const login = async (req, res) => {
                 _id: user._id,
                 userName: user.userName,
                 email: user.email,
-                token: generateToken({ id: user._id }),
+                profilePicture: user.profilePicture,
+                function: user.function,
+                designation: user.designation,
+                experience: user.experience,
+                status: user.status,
+                location: user.location,
+                fullName: user.fullName,
+                yearOfJoining: user.yearOfJoining,
+                token: generateToken({ id: user._id })
             });
         } else {
-            
             res.status(401).json({ message: 'Invalid email or password' });
-            
         }
     } catch (error) {
         res.status(500).json({ message: error.message });

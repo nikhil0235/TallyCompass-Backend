@@ -41,20 +41,19 @@ const addCustomer = async (req, res) => {
 // @access  Private
 const updateCustomer = async (req, res) => {
     try {
-        const customer = await Customer.findOne({ _id: req.params.id });
+        const updatedCustomer = await Customer.findOneAndUpdate(
+            { _id: req.params.id },
+            req.body,
+            { new: true, runValidators: false }
+        );
 
-        if (!customer) {
+        if (!updatedCustomer) {
             return res.status(404).json({ message: 'Customer not found' });
         }
 
-        const updatedCustomer = await Customer.findOneAndUpdate(
-            { _id: req.params.id, user: req.user._id },
-            req.body,
-            { new: true }
-        );
-
         res.json(updatedCustomer);
     } catch (error) {
+        console.error('Update error:', error);
         res.status(500).json({ message: error.message });
     }
 };

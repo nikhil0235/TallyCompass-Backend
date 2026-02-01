@@ -8,7 +8,7 @@ const feedbackSchema = new mongoose.Schema({
     },
     medium: {
         type: String,
-        enum: ['Email', 'Phone'] // "medium of feedback Email, Phone"
+        enum: ['Email', 'Phone', 'Survey', 'Chat']
     },
     description: {
         type: String,

@@ -10,7 +10,9 @@ const addCustomerRequest = async (req, res) => {
         if (req.body.description) {
             await checkAndSendMentions(req.body.description, 'CustomerRequest', customerRequest._id, req.user._id);
         }
-        res.status(201).json(customerRequest);
+        const response = customerRequest.toObject();
+        response.type = response.requestType;
+        res.status(201).json(response);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -22,14 +24,24 @@ const addCustomerRequest = async (req, res) => {
 const updateCustomerRequest = async (req, res) => {
     try {
         const customerRequest = await CustomerRequest.findById(req.params.id);
+        console.log ('Updating customer request with data:', req.body);
         if (!customerRequest) {
             return res.status(404).json({ message: 'Customer Request not found' });
         }
-        const updatedCustomerRequest = await CustomerRequest.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const allowedFields = ['requestTitle', 'description', 'requestType', 'priority', 'action'];
+        const updateData = {};
+        allowedFields.forEach(field => {
+            if (req.body[field] !== undefined) {
+                updateData[field] = req.body[field];
+            }
+        });
+        const updatedCustomerRequest = await CustomerRequest.findByIdAndUpdate(req.params.id, updateData, { new: true, runValidators: true });
         if (req.body.description) {
             await checkAndSendMentions(req.body.description, 'CustomerRequest', updatedCustomerRequest._id, req.user._id);
         }
-        res.json(updatedCustomerRequest);
+        const response = updatedCustomerRequest.toObject();
+        response.type = response.requestType;
+        res.json(response);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -46,7 +58,9 @@ const getCustomerRequest = async (req, res) => {
         if (!customerRequest) {
             return res.status(404).json({ message: 'Customer Request not found' });
         }
-        res.json(customerRequest);
+        const response = customerRequest.toObject();
+        response.type = response.requestType;
+        res.json(response);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -58,7 +72,12 @@ const getCustomerRequest = async (req, res) => {
 const getAllCustomerRequests = async (req, res) => {
     try {
         const customerRequests = await CustomerRequest.find();
-        res.json(customerRequests);
+        const response = customerRequests.map(req => {
+            const obj = req.toObject();
+            obj.type = obj.requestType;
+            return obj;
+        });
+        res.json(response);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

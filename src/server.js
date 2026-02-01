@@ -14,8 +14,8 @@ const authRoutes = require('./routes/authRoutes');
 const app = express();
 
 // Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(cors(corsOptions));
 app.use(cookieParser());
 
@@ -29,7 +29,7 @@ app.use('/api/feedback', require('./routes/feedbackRoutes'));
 app.use('/api/customer-requests', require('./routes/customerRequestRoutes'));
 app.use('/api/features', require('./routes/featureRoutes'));
 app.use('/api/search', require('./routes/searchRoutes'));
-app.use('/', require('./routes/mediaRoutes'));
+app.use('/api/media', require('./routes/mediaRoutes'));
 app.use('/api/dashboard', require('./routes/dashboardRoutes'));
 app.use('/api/forms', require('./routes/formRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
