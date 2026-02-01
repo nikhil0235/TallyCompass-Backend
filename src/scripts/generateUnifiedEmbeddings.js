@@ -5,10 +5,12 @@ const Product = require('../models/Product');
 const VOC = require('../models/VOC');
 const CustomerRequest = require('../models/CustomerRequest');
 const Feedback = require('../models/Feedback');
+const User = require('../models/User');
+const FormResponse = require('../models/FormResponse');
 const UnifiedEmbedding = require('../models/UnifiedEmbedding');
 const { syncDocument } = require('../utils/embeddingSync');
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/connectedcustomer';
+const MONGODB_URI = process.env.MONGO_URI;
 
 const connectDB = async () => {
     try {
@@ -56,6 +58,18 @@ const generateAllEmbeddings = async () => {
         const feedbacks = await Feedback.find({});
         for (const doc of feedbacks) {
             await syncDocument(doc, 'Feedback');
+        }
+
+        console.log('Processing Users...');
+        const users = await User.find({});
+        for (const doc of users) {
+            await syncDocument(doc, 'User');
+        }
+
+        console.log('Processing FormResponses...');
+        const formResponses = await FormResponse.find({});
+        for (const doc of formResponses) {
+            await syncDocument(doc, 'FormResponse');
         }
 
         console.log('All embeddings generated successfully!');

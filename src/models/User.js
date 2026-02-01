@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
   fullName: {
     type: String,
     required: true,
-    default:"Tally User"
+    default: "Tally User"
   },
 
   userName: {
@@ -70,5 +70,25 @@ userSchema.pre('save', async function (next) {
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
+
+userSchema.post('save', function (doc) {
+  const { syncDocument } = require('../utils/embeddingSync');
+  syncDocument(doc, 'User');
+});
+
+userSchema.post('findOneAndUpdate', async function (doc) {
+  if (doc) {
+    const { syncDocument } = require('../utils/embeddingSync');
+    const freshDoc = await doc.constructor.findById(doc._id);
+    if (freshDoc) syncDocument(freshDoc, 'User');
+  }
+});
+
+userSchema.post('findOneAndDelete', function (doc) {
+  if (doc) {
+    const { deleteDocumentEmbedding } = require('../utils/embeddingSync');
+    deleteDocumentEmbedding(doc._id, 'User');
+  }
+});
 
 module.exports = mongoose.model('User', userSchema);
