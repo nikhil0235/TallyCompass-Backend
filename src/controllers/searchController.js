@@ -36,6 +36,7 @@ const search = async (req, res) => {
                     "_id": 0,
                     "text": 1,
                     "sourceCollection": 1,
+                    "sourceId": 1,
                     // "score": { "$meta": "vectorSearchScore" } // Optional: include score
                 }
             }
@@ -46,11 +47,13 @@ const search = async (req, res) => {
         }
 
         // 3. Construct context
-        const context = results.map(r => r.text).join('\n---\n');
+        const context = results.map(r => `[Source: ${r.sourceCollection} | ID: ${r.sourceId}] ${r.text}`).join('\n---\n');
 
         // 4. Generate Answer
         const systemPrompt = `You are a helpful assistant for the 'Voice of Customer' platform.
         Use the following pieces of context to answer the user's question.
+        Each piece of context starts with [Source: COLLECTION | ID: IDENTIFIER].
+        When answering, you can reference the source type and ID if relevant.
         Context:
         ${context}
         `;
@@ -59,7 +62,11 @@ const search = async (req, res) => {
 
         res.json({
             answer,
-            sources: results.map(r => ({ collection: r.sourceCollection, content: r.text }))
+            sources: results.map(r => ({
+                collection: r.sourceCollection,
+                id: r.sourceId,
+                content: r.text
+            }))
         });
 
     } catch (error) {
