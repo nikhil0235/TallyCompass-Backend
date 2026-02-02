@@ -6,6 +6,7 @@ const VOC = require('../models/VOC');
 const Product = require('../models/Product');
 const CustomerRequest = require('../models/CustomerRequest');
 const Feature = require('../models/Feature');
+const FormResponse = require('../models/FormResponse');
 
 const dashboardController = {
   async getDashboardStats(req, res) {
@@ -15,12 +16,14 @@ const dashboardController = {
         totalCustomers,
         activeVOCProjects,
         averageCustomerRating,
-        pendingRequests
+        pendingRequests,
+        formResponseCount
       ] = await Promise.all([
         Customer.countDocuments(),
         VOC.countDocuments({ status: 'Ongoing' }),
         Feedback.aggregate([{ $group: { _id: null, avg: { $avg: '$rating' } } }]).then(r => r[0]?.avg || 0),
-        CustomerRequest.countDocuments({ 'action.status': 'pending' })
+        CustomerRequest.countDocuments({ 'action.status': 'pending' }),
+        FormResponse.countDocuments()
       ]);
 
       // --- Customer Analytics ---
@@ -77,7 +80,7 @@ const dashboardController = {
       };
       const completedVOCs = await VOC.find({ status: 'Completed', vocStartDate: { $exists: true }, vocEndDate: { $exists: true } });
       const vocCompletionRate = (completedVOCs.length / (vocStatusAgg.reduce((a, b) => a + b.count, 0) || 1)) * 100;
-      const activeVOCCount = vocProjectStatus.ongoing;
+      // Removed activeVOCCount (duplicate)
       const avgVOCDurationDays = completedVOCs.length > 0 ?
         (completedVOCs.reduce((sum, voc) => sum + ((voc.vocEndDate - voc.vocStartDate) / (1000 * 60 * 60 * 24)), 0) / completedVOCs.length) : 0;
       // Top participating customers
@@ -165,7 +168,7 @@ const dashboardController = {
           averageCustomerRating,
           pendingRequests,
           vocCompletionRate,
-          activeVOCCount,
+          formResponseCount,
         },
         customerAnalytics: {
           customerStatus,
@@ -178,7 +181,6 @@ const dashboardController = {
         vocProjectInsights: {
           vocProjectStatus,
           vocCompletionRate,
-          activeVOCCount,
           avgVOCDurationDays,
           topParticipatingCustomers,
         },
