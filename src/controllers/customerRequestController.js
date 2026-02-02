@@ -59,7 +59,9 @@ const updateCustomerRequest = async (req, res) => {
 const getCustomerRequest = async (req, res) => {
     try {
         const customerRequest = await CustomerRequest.findById(req.params.id)
+           .populate('customterList')
             .populate('productId');
+
         if (!customerRequest) {
             return res.status(404).json({ message: 'Customer Request not found' });
         }
