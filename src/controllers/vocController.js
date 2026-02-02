@@ -1,4 +1,5 @@
 const VOC = require('../models/VOC');
+const { sendNotifications } = require('../utils/notification');
 
 
 // @desc    Add a new VOC
@@ -18,12 +19,15 @@ const addVOC = async (req, res) => {
         // Transform customerDetailsObj if it exists
         if (req.body.customerDetailsObj) {
             const customerDetails = req.body.customerDetailsObj;
-
-            // Handle customerID - can be string or object
+            
+            // Handle customerID - convert string IDs to ObjectIds while preserving status
             if (customerDetails.customerID && Array.isArray(customerDetails.customerID)) {
-                customerDetails.customerID = customerDetails.customerID.map(item =>
-                    typeof item === 'string' ? item : item.customerID
-                ).filter(Boolean);
+                customerDetails.customerID = customerDetails.customerID.map(item => {
+                    if (typeof item === 'string') {
+                        return { customerID: item, status: 'Pending' }
+                    }
+                    return { customerID: item.customerID || item, status: item.status || 'Pending' }
+                })
             }
 
             // Handle feedbackID - can be string or object
@@ -46,7 +50,6 @@ const addVOC = async (req, res) => {
         const voc = await VOC.create({ ...req.body, userID: req.user._id });
 
         if (req.body.description || (req.body.stakeHolders && req.body.stakeHolders.length > 0)) {
-            const { sendNotifications } = require('../utils/notification');
             await sendNotifications(req.body.description, 'VOC', voc._id, req.user._id, req.body.stakeHolders);
         }
         console.log(`VOC created with ID: ${voc._id} by User: ${req.user._id}`);
@@ -83,12 +86,15 @@ const updateVOC = async (req, res) => {
         if (req.body.customerDetailsObj) {
             const customerDetails = req.body.customerDetailsObj;
             console.log('UPDATE VOC - CustomerDetailsObj received:', customerDetails);
-
-            // Handle customerID - can be string or object
+            
+            // Handle customerID - convert string IDs to ObjectIds while preserving status
             if (customerDetails.customerID && Array.isArray(customerDetails.customerID)) {
-                customerDetails.customerID = customerDetails.customerID.map(item =>
-                    typeof item === 'string' ? item : item.customerID
-                ).filter(Boolean);
+                customerDetails.customerID = customerDetails.customerID.map(item => {
+                    if (typeof item === 'string') {
+                        return { customerID: item, status: 'Pending' }
+                    }
+                    return { customerID: item.customerID || item, status: item.status || 'Pending' }
+                })
             }
 
             // Handle feedbackID - can be string or object
@@ -111,8 +117,10 @@ const updateVOC = async (req, res) => {
         const updatedVOC = await VOC.findByIdAndUpdate(req.params.id, req.body, { new: true });
         const stakeholders = req.body.stakeHolders || updatedVOC.stakeHolders;
         if (req.body.description || (stakeholders && stakeholders.length > 0)) {
-            const { sendNotifications } = require('../utils/notification');
-            await sendNotifications(req.body.description, 'VOC', updatedVOC._id, req.user._id, stakeholders);
+            // Skip notifications in development to avoid email errors
+            if (process.env.NODE_ENV === 'production') {
+                await sendNotifications(req.body.description, 'VOC', updatedVOC._id, req.user._id, stakeholders);
+            }
         }
         console.log(`UPDATE VOC - VOC updated with ID: ${updatedVOC._id}`);
         res.json(updatedVOC);
@@ -128,11 +136,31 @@ const updateVOC = async (req, res) => {
 // @access  Private
 const getVOC = async (req, res) => {
     try {
-        const voc = await VOC.findById(req.params.id).populate('userID').populate('ProductID').populate('customerDetailsObj.customerID');
+        const voc = await VOC.findById(req.params.id)
+            .populate('userID')
+            .populate('ProductID')
+            .populate('customerDetailsObj.feedbackID')
+            .populate('customerDetailsObj.customerRequestID')
+            .populate('stakeHolders');
+        
         if (!voc) {
             return res.status(404).json({ message: 'VOC not found' });
         }
-
+        
+        if (voc.customerDetailsObj?.customerID?.length > 0) {
+            const Customer = require('../models/Customer');
+            voc.customerDetailsObj.customerID = await Promise.all(
+                voc.customerDetailsObj.customerID.map(async (item) => {
+                    const custId = typeof item === 'string' ? item : item.customerID;
+                    const customer = await Customer.findById(custId);
+                    return {
+                        customerID: customer,
+                        status: typeof item === 'string' ? 'Pending' : item.status
+                    };
+                })
+            );
+        }
+        
         res.json(voc);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -145,10 +173,30 @@ const getVOC = async (req, res) => {
 const getAllVOCs = async (req, res) => {
     try {
         const queryObj = { ...req.query };
-        // Basic filtering logic can be added here if needed, e.g., ?Status=Open
-        // req.query automatically handles simple key-value pairs which match Mongoose structure.
 
-        const vocs = await VOC.find(queryObj);
+        const vocs = await VOC.find(queryObj)
+            .populate('userID')
+            .populate('ProductID')
+            .populate('customerDetailsObj.feedbackID')
+            .populate('customerDetailsObj.customerRequestID')
+            .populate('stakeHolders');
+        
+        const Customer = require('../models/Customer');
+        for (let voc of vocs) {
+            if (voc.customerDetailsObj?.customerID?.length > 0) {
+                voc.customerDetailsObj.customerID = await Promise.all(
+                    voc.customerDetailsObj.customerID.map(async (item) => {
+                        const custId = typeof item === 'string' ? item : item.customerID;
+                        const customer = await Customer.findById(custId);
+                        return {
+                            customerID: customer,
+                            status: typeof item === 'string' ? 'Pending' : item.status
+                        };
+                    })
+                );
+            }
+        }
+        
         res.json(vocs);
     } catch (error) {
         res.status(500).json({ message: error.message });

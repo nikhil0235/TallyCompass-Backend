@@ -7,10 +7,13 @@ const { checkAndSendMentions } = require('../utils/notification');
 const addCustomerRequest = async (req, res) => {
     try {
         const customerRequest = await CustomerRequest.create(req.body);
+        const populatedRequest = await CustomerRequest.findById(customerRequest._id)
+            .populate('customterList')
+            .populate('productId');
         if (req.body.description) {
             await checkAndSendMentions(req.body.description, 'CustomerRequest', customerRequest._id, req.user._id);
         }
-        const response = customerRequest.toObject();
+        const response = populatedRequest.toObject();
         response.type = response.requestType;
         res.status(201).json(response);
     } catch (error) {
@@ -35,7 +38,10 @@ const updateCustomerRequest = async (req, res) => {
                 updateData[field] = req.body[field];
             }
         });
-        const updatedCustomerRequest = await CustomerRequest.findByIdAndUpdate(req.params.id, updateData, { new: true, runValidators: true });
+        await CustomerRequest.findByIdAndUpdate(req.params.id, updateData, { new: true, runValidators: true });
+        const updatedCustomerRequest = await CustomerRequest.findById(req.params.id)
+            .populate('customterList')
+            .populate('productId');
         if (req.body.description) {
             await checkAndSendMentions(req.body.description, 'CustomerRequest', updatedCustomerRequest._id, req.user._id);
         }
@@ -71,7 +77,9 @@ const getCustomerRequest = async (req, res) => {
 // @access  Private
 const getAllCustomerRequests = async (req, res) => {
     try {
-        const customerRequests = await CustomerRequest.find();
+        const customerRequests = await CustomerRequest.find()
+            .populate('customterList')
+            .populate('productId');
         const response = customerRequests.map(req => {
             const obj = req.toObject();
             obj.type = obj.requestType;

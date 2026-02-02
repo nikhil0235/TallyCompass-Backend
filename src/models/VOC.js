@@ -48,8 +48,16 @@ const vocSchema = new mongoose.Schema({
             ref: 'CustomerRequest'
         }],
         customerID: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Customer'
+            customerID: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Customer'
+            },
+            status: {
+                type: String,
+                enum: ['Pending', 'Completed', 'Cancelled'],
+                default: 'Pending',
+                dependsOn:  'customerDetailsObj.customerID.customerID'
+            }
         }],
         status: {
             type: String,

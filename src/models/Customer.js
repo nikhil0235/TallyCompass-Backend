@@ -55,7 +55,7 @@ const customerSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        unique: true,
+         unique: true,
         sparse: true,
         match: [
             /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,

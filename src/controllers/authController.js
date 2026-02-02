@@ -8,12 +8,28 @@ const { sendResetEmail } = require('../../config/email');
 const signup = async (req, res) => {
     try {
         const { userName, email, password } = req.body;
-        console.log(req.body);
 
-        // Check if user exists
-        const userExists = await User.findOne({ email });
-        if (userExists) {
-            return res.status(400).json({ message: 'User already exists' });
+        // Validate required fields
+        if (!userName) {
+            return res.status(400).json({ message: 'Username is required' });
+        }
+        if (!email) {
+            return res.status(400).json({ message: 'Email is required' });
+        }
+        if (!password) {
+            return res.status(400).json({ message: 'Password is required' });
+        }
+
+        // Check if email already exists
+        const emailExists = await User.findOne({ email });
+        if (emailExists) {
+            return res.status(400).json({ message: 'Email already exists' });
+        }
+
+        // Check if username already exists
+        const usernameExists = await User.findOne({ userName });
+        if (usernameExists) {
+            return res.status(400).json({ message: 'Username already exists' });
         }
 
         // Create user
@@ -23,19 +39,26 @@ const signup = async (req, res) => {
             password,
         });
 
-        if (user) {
-            res.status(201).json({
-                _id: user._id,
-                userName: user.userName,
-                email: user.email,
-                token: generateToken({ id: user._id }),
-            });
-        } else {
-            res.status(400).json({ message: 'Invalid user data' });
+        if (!user) {
+            return res.status(400).json({ message: 'Failed to create user' });
         }
+
+        res.status(201).json({
+            _id: user._id,
+            userName: user.userName,
+            email: user.email,
+            profilePicture: user.profilePicture,
+            function: user.function,
+            designation: user.designation,
+            experience: user.experience,
+            status: user.status,
+            location: user.location,
+            fullName: user.fullName,
+            yearOfJoining: user.yearOfJoining,
+            token: generateToken({ id: user._id }),
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
-        console.log(error);
     }
 };
 
@@ -50,27 +73,32 @@ const login = async (req, res) => {
 
         // Check for user email
         const user = await User.findOne({ email });
-        console.log(user._id);
-        console.log(password);
-
-        if (user && (password === user.password || await user.matchPassword(password))) {
-            res.json({
-                _id: user._id,
-                userName: user.userName,
-                email: user.email,
-                profilePicture: user.profilePicture,
-                function: user.function,
-                designation: user.designation,
-                experience: user.experience,
-                status: user.status,
-                location: user.location,
-                fullName: user.fullName,
-                yearOfJoining: user.yearOfJoining,
-                token: generateToken({ id: user._id })
-            });
-        } else {
-            res.status(401).json({ message: 'Invalid email or password' });
+        
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
         }
+
+        // Check password
+        const isPasswordValid = password === user.password || await user.matchPassword(password);
+        
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: 'Incorrect password' });
+        }
+
+        res.json({
+            _id: user._id,
+            userName: user.userName,
+            email: user.email,
+            profilePicture: user.profilePicture,
+            function: user.function,
+            designation: user.designation,
+            experience: user.experience,
+            status: user.status,
+            location: user.location,
+            fullName: user.fullName,
+            yearOfJoining: user.yearOfJoining,
+            token: generateToken({ id: user._id })
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
