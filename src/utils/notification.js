@@ -1,24 +1,8 @@
 const User = require('../models/User');
 const Notification = require('../models/Notification');
+const { getSocketIO } = require('../socket');
 const sendEmail = require('./sendEmail');
 
-/**
- * Parses description for @mentions and sends emails to mentioned users.
- * Also creates Notification records in DB.
- * @param {string} description - The text content to parse.
- * @param {string} source - The source context (e.g., 'VOC', 'Feedback').
- * @param {string} id - The ID of the item created/updated.
- * @param {string} fromUserId - The ID of the user performing the action.
- */
-/**
- * Parses description for @mentions and sends emails to mentioned users and additional recipients.
- * Also creates Notification records in DB.
- * @param {string} description - The text content to parse.
- * @param {string} source - The source context (e.g., 'VOC', 'Feedback').
- * @param {string} id - The ID of the item created/updated.
- * @param {string} fromUserId - The ID of the user performing the action.
- * @param {Array} additionalRecipients - Array of User IDs to also notify.
- */
 const sendNotifications = async (description, source, id, fromUserId, additionalRecipients = []) => {
     // Regex to find @username
     const mentionRegex = /@(\w+)/g;
@@ -49,13 +33,24 @@ const sendNotifications = async (description, source, id, fromUserId, additional
             if (user._id.toString() === fromUserId.toString()) return;
 
             // Create in-app notification
-            await Notification.create({
+            const notification = await Notification.create({
                 description: `You were mentioned/added in a ${source}`, // Generic message, can be refined based on context
                 toUser: user._id,
                 fromUser: fromUserId,
                 resourceId: id,
                 resourceModel: source
             });
+
+            // Emit real-time event via Socket.IO
+            try {
+                const io = getSocketIO();
+                if (io) {
+                    io.to(user._id.toString()).emit('new-notification', notification);
+                    console.log(`Emitted real-time notification to user ${user._id}`);
+                }
+            } catch (socketError) {
+                console.error('Socket.IO emit error in sendNotifications:', socketError);
+            }
 
             // Send Email
             const message = `
