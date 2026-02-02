@@ -2,7 +2,7 @@ const corsOptions = {
   origin: [
     'http://localhost:5173',
     'https://tallycompass.netlify.app',
-    'https://tallyinterect.onrender.com'
+    'https://tallyinteract.netlify.app'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
