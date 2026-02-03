@@ -181,19 +181,31 @@ const getAllVOCs = async (req, res) => {
             .populate('customerDetailsObj.customerRequestID')
             .populate('stakeHolders');
         
+        const customerIds = [];
+        for (const voc of vocs) {
+            if (voc.customerDetailsObj?.customerID?.length) {
+                for (const item of voc.customerDetailsObj.customerID) {
+                    customerIds.push(typeof item === 'string' ? item : item.customerID);
+                }
+            }
+        }
+
         const Customer = require('../models/Customer');
-        for (let voc of vocs) {
-            if (voc.customerDetailsObj?.customerID?.length > 0) {
-                voc.customerDetailsObj.customerID = await Promise.all(
-                    voc.customerDetailsObj.customerID.map(async (item) => {
-                        const custId = typeof item === 'string' ? item : item.customerID;
-                        const customer = await Customer.findById(custId);
+        const customers = customerIds.length ? await Customer.find({ _id: { $in: customerIds } }).lean() : [];
+
+        const customerMap = new Map(customers.map(c => [c._id.toString(), c]));
+
+        for (const voc of vocs) {
+            if (voc.customerDetailsObj?.customerID?.length) {
+                voc.customerDetailsObj.customerID =
+                    voc.customerDetailsObj.customerID.map(item => {
+                        const id = typeof item === 'string'? item : item.customerID;
+
                         return {
-                            customerID: customer,
-                            status: typeof item === 'string' ? 'Pending' : item.status
+                            customerID: id ? customerMap.get(String(id)) || null : null,
+                            status:typeof item === 'string'? 'Pending': item.status
                         };
-                    })
-                );
+                    });
             }
         }
         
